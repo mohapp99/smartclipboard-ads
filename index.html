@@ -1,48 +1,170 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Publicité</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 10px;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #2D2D2D; /* Correspond à ListItemBrush */
-            color: #E6E6EB; /* Correspond à TextPrimaryBrush */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-        a {
-            color: #78A0FF; /* Correspond à AccentColor */
-            text-decoration: none;
-            font-weight: bold;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-            margin-top: 10px;
-            border: 1px solid #464650; /* Correspond à BorderColor */
-        }
-        .ad-container {
-            width: 100%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicité – SmartClipboard</title>
+
+  <!-- === Styles identiques à ton design existant === -->
+  <style>
+    body, html {
+      margin: 0;
+      padding: 10px;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #2D2D2D; /* couleur ListItemBrush */
+      color: #E6E6EB;           /* couleur TextPrimaryBrush */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    a {
+      color: #78A0FF; /* AccentColor */
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    img, video, iframe {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin-top: 10px;
+      border: 1px solid #464650; /* BorderColor */
+    }
+
+    .ad-container {
+      width: 100%; /* correspond à la zone 20% de ton interface app */
+    }
+  </style>
+
+  <!-- === Script Google AdSense (obligatoire, remplace l'ID client par le tien) === -->
+  <script async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXX"
+          crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="ad-container">
-        <h4>Découvrez notre nouveau produit !</h4>
-        <a href="https://www.microsoft.com" target="_blank">
-            <p>Cliquez ici pour en savoir plus</p>
-            <img src="https://via.placeholder.com/200x150.png?text=Votre+Pub+Ici" alt="Publicité">
-        </a>
-    </div>
+  <div class="ad-container">
+    <h4 id="adTitle">Découvrez notre nouveau produit !</h4>
+    <a id="adLink" href="https://www.microsoft.com" target="_blank">
+      <p id="adDesc">Cliquez ici pour en savoir plus</p>
+      <div id="adMedia"></div>
+    </a>
+
+    <!-- === Bloc publicitaire Google AdSense responsive === -->
+    <!-- ⚙️ Option 1 : Publicité automatique (Google choisit le format optimal) -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXX"  <!-- 🔁 ton identifiant AdSense -->
+         data-ad-slot="1111111111"             <!-- 🔁 ton ID d’emplacement -->
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <script>
+    /**************************************************************
+     * 🎯  SCRIPT DE ROTATION DES PUBLICITÉS PERSONNALISÉES
+     * Tu peux combiner ce système avec AdSense, ou t’en servir
+     * pour afficher tes propres pubs (image/vidéo/partenaires).
+     **************************************************************/
+
+    const ads = [
+      {
+        type: "image",
+        title: "Découvrez notre nouveau produit !",
+        desc: "Cliquez ici pour en savoir plus",
+        link: "https://www.microsoft.com",
+        src: "https://via.placeholder.com/200x150.png?text=Pub+Microsoft"
+      },
+      {
+        type: "video",
+        title: "Regardez notre nouvelle vidéo promo !",
+        desc: "Ne manquez pas notre dernière innovation",
+        link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        src: "https://www.w3schools.com/html/mov_bbb.mp4"
+      },
+      {
+        type: "image",
+        title: "Promo exclusive !",
+        desc: "Offres limitées, cliquez pour voir",
+        link: "https://www.apple.com",
+        src: "https://via.placeholder.com/200x150.png?text=Pub+Apple"
+      }
+    ];
+
+    let current = 0;
+
+    // 🔁 Fonction d’affichage d’une publicité
+    function showAd(index) {
+      const ad = ads[index];
+      document.getElementById("adTitle").innerText = ad.title;
+      document.getElementById("adDesc").innerText = ad.desc;
+      document.getElementById("adLink").href = ad.link;
+
+      const mediaDiv = document.getElementById("adMedia");
+      mediaDiv.innerHTML = "";
+
+      if (ad.type === "image") {
+        const img = document.createElement("img");
+        img.src = ad.src;
+        mediaDiv.appendChild(img);
+      } else if (ad.type === "video") {
+        const video = document.createElement("video");
+        video.src = ad.src;
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = true;
+        mediaDiv.appendChild(video);
+      }
+    }
+
+    // Première pub au chargement
+    showAd(current);
+
+    // 🔄 Changer de pub toutes les 45 secondes
+    setInterval(() => {
+      current = (current + 1) % ads.length;
+      showAd(current);
+    }, 45000);
+  </script>
+
+  <!--
+  ===============================================================
+  🧩 COMMENTAIRES ET OPTIONS
+  ===============================================================
+  ✅ Option 1 : Google AdSense classique (déjà intégré ci-dessus)
+       - Nécessite que ton domaine GitHub Pages soit validé dans ton compte.
+       - Tu peux ajouter d’autres formats, ex. :
+           data-ad-format="rectangle"
+           data-ad-layout="in-article"
+           data-ad-slot="2222222222"
+
+  ✅ Option 2 : Rotation personnalisée (script JS)
+       - Utilise ton propre tableau "ads" avec images/vidéos externes.
+       - Parfait si tu veux des pubs internes à ton app.
+
+  ✅ Option 3 : Mixte
+       - Affiche 1 pub AdSense + 1 pub perso.
+       - Tu peux même varier entre les deux dans le setInterval().
+
+  ✅ Option 4 : Rafraîchissement automatique d’AdSense
+       - Pour recharger un bloc sans recharger la page :
+           setInterval(() => {
+               (adsbygoogle = window.adsbygoogle || []).push({});
+           }, 60000);
+       - ⚠️ Ne pas abuser : Google déconseille trop de rechargements.
+
+  ===============================================================
+  💡 CONSEILS
+  ---------------------------------------------------------------
+  - Teste ta page dans un vrai navigateur (Edge, Chrome)
+  - Vérifie dans la console AdSense si ton domaine est validé.
+  - Garde ton design simple : AdSense s’adapte automatiquement.
+  ===============================================================
+  -->
 </body>
 </html>
