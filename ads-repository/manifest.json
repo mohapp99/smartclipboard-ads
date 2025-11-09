@@ -1,4 +1,7 @@
-[
-  "mohapp.PNG",
-  "eee.PNG"
-]
+{
+  "localAds": [
+    "file:///C:/.../mohapp.PNG",
+    "file:///C:/.../eee.PNG"
+  ]
+}
+
