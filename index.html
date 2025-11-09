@@ -5,7 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Publicité – SmartClipboard</title>
 
-  <!-- === Styles identiques à ton design existant === -->
+  <!-- 🔹 Balise Meta requise par AdSense -->
+  <meta name="google-adsense-account" content="ca-pub-4439906628582965">
+
+  <!-- 🔹 Script principal Google AdSense (à inclure une seule fois dans le <head>) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4439906628582965"
+          crossorigin="anonymous"></script>
+
+  <!-- === Styles (identiques à ton app, aucune modification visuelle) === -->
   <style>
     body, html {
       margin: 0;
@@ -37,42 +44,36 @@
     }
 
     .ad-container {
-      width: 100%; /* correspond à la zone 20% de ton interface app */
+      width: 100%; /* correspond à la zone de 20% dans ton app */
     }
   </style>
-
-  <!-- === Script Google AdSense (obligatoire, remplace l'ID client par le tien) === -->
-  <script async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXX"
-          crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="ad-container">
-    <h4 id="adTitle">Découvrez notre nouveau produit !</h4>
-    <a id="adLink" href="https://www.microsoft.com" target="_blank">
-      <p id="adDesc">Cliquez ici pour en savoir plus</p>
-      <div id="adMedia"></div>
-    </a>
-
-    <!-- === Bloc publicitaire Google AdSense responsive === -->
-    <!-- ⚙️ Option 1 : Publicité automatique (Google choisit le format optimal) -->
+    <!-- === Bloc d’annonce automatique AdSense (Google choisit le format) === -->
+    <!-- ✅ Ce bloc affichera des annonces adaptées (images, texte, vidéo, etc.) -->
     <ins class="adsbygoogle"
          style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXXXX"  <!-- 🔁 ton identifiant AdSense -->
-         data-ad-slot="1111111111"             <!-- 🔁 ton ID d’emplacement -->
+         data-ad-client="ca-pub-4439906628582965"
+         data-ad-slot="7584788658"
          data-ad-format="auto"
          data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+
+    <!-- === Zone de publicité personnalisée (optionnelle, pour tes propres pubs internes) === -->
+    <div id="customAds" style="margin-top: 20px;"></div>
   </div>
 
   <script>
     /**************************************************************
-     * 🎯  SCRIPT DE ROTATION DES PUBLICITÉS PERSONNALISÉES
-     * Tu peux combiner ce système avec AdSense, ou t’en servir
-     * pour afficher tes propres pubs (image/vidéo/partenaires).
+     * 🎯 Système optionnel de rotation de pubs personnalisées
+     * Tu peux combiner ce système avec AdSense pour garder
+     * un flux constant d’annonces (photo, vidéo, etc.)
      **************************************************************/
 
-    const ads = [
+    const customAds = [
       {
         type: "image",
         title: "Découvrez notre nouveau produit !",
@@ -89,8 +90,8 @@
       },
       {
         type: "image",
-        title: "Promo exclusive !",
-        desc: "Offres limitées, cliquez pour voir",
+        title: "Offre exclusive !",
+        desc: "Profitez de réductions spéciales",
         link: "https://www.apple.com",
         src: "https://via.placeholder.com/200x150.png?text=Pub+Apple"
       }
@@ -98,72 +99,65 @@
 
     let current = 0;
 
-    // 🔁 Fonction d’affichage d’une publicité
-    function showAd(index) {
-      const ad = ads[index];
-      document.getElementById("adTitle").innerText = ad.title;
-      document.getElementById("adDesc").innerText = ad.desc;
-      document.getElementById("adLink").href = ad.link;
-
-      const mediaDiv = document.getElementById("adMedia");
-      mediaDiv.innerHTML = "";
-
-      if (ad.type === "image") {
-        const img = document.createElement("img");
-        img.src = ad.src;
-        mediaDiv.appendChild(img);
-      } else if (ad.type === "video") {
-        const video = document.createElement("video");
-        video.src = ad.src;
-        video.autoplay = true;
-        video.muted = true;
-        video.loop = true;
-        mediaDiv.appendChild(video);
-      }
+    function showCustomAd(index) {
+      const ad = customAds[index];
+      const container = document.getElementById("customAds");
+      container.innerHTML = `
+        <h4>${ad.title}</h4>
+        <a href="${ad.link}" target="_blank">
+          <p>${ad.desc}</p>
+          ${
+            ad.type === "video"
+              ? `<video src="${ad.src}" autoplay muted loop></video>`
+              : `<img src="${ad.src}" alt="Publicité">`
+          }
+        </a>`;
     }
 
-    // Première pub au chargement
-    showAd(current);
-
-    // 🔄 Changer de pub toutes les 45 secondes
+    // 🔁 Alterner toutes les 45 secondes entre les pubs internes
+    showCustomAd(current);
     setInterval(() => {
-      current = (current + 1) % ads.length;
-      showAd(current);
+      current = (current + 1) % customAds.length;
+      showCustomAd(current);
     }, 45000);
   </script>
 
   <!--
   ===============================================================
-  🧩 COMMENTAIRES ET OPTIONS
+  🧩 COMMENTAIRES D’INTÉGRATION
   ===============================================================
-  ✅ Option 1 : Google AdSense classique (déjà intégré ci-dessus)
-       - Nécessite que ton domaine GitHub Pages soit validé dans ton compte.
-       - Tu peux ajouter d’autres formats, ex. :
-           data-ad-format="rectangle"
-           data-ad-layout="in-article"
-           data-ad-slot="2222222222"
 
-  ✅ Option 2 : Rotation personnalisée (script JS)
-       - Utilise ton propre tableau "ads" avec images/vidéos externes.
-       - Parfait si tu veux des pubs internes à ton app.
+  ✅ Partie 1 – Google AdSense officiel
+  ------------------------------------
+  - Le script <script async src="..."> dans le <head> charge le SDK AdSense.
+  - Le bloc <ins class="adsbygoogle"> est ton emplacement d’annonce.
+  - Google diffusera automatiquement des annonces adaptées
+    (images, bannières, texte, vidéo selon ton trafic).
 
-  ✅ Option 3 : Mixte
-       - Affiche 1 pub AdSense + 1 pub perso.
-       - Tu peux même varier entre les deux dans le setInterval().
+  ✅ Partie 2 – Pubs personnalisées
+  ---------------------------------
+  - Le tableau "customAds" contient tes propres pubs internes (image ou vidéo).
+  - Elles alternent toutes les 45 secondes.
+  - Tu peux supprimer cette partie si tu veux seulement AdSense.
 
-  ✅ Option 4 : Rafraîchissement automatique d’AdSense
-       - Pour recharger un bloc sans recharger la page :
-           setInterval(() => {
-               (adsbygoogle = window.adsbygoogle || []).push({});
-           }, 60000);
-       - ⚠️ Ne pas abuser : Google déconseille trop de rechargements.
+  ✅ Partie 3 – Compatibilité application Windows
+  -----------------------------------------------
+  - Ton application charge cette page dans un WebView / BrowserControl.
+  - Elle affiche automatiquement le contenu HTML.
+  - Aucune modification côté C# n’est requise.
+
+  ✅ Option avancée – AMP
+  -----------------------------------------------
+  - Tu n’as PAS besoin du code AMP si ton site n’utilise pas le format AMP.
+  - GitHub Pages sert du HTML normal, donc le code ci-dessus suffit.
+  - Le code AMP (<amp-ad>) est réservé aux pages <html amp>.
 
   ===============================================================
   💡 CONSEILS
   ---------------------------------------------------------------
-  - Teste ta page dans un vrai navigateur (Edge, Chrome)
-  - Vérifie dans la console AdSense si ton domaine est validé.
-  - Garde ton design simple : AdSense s’adapte automatiquement.
+  - Vérifie dans AdSense que le domaine "mohapp99.github.io" est bien validé.
+  - Attends parfois 24–48 h avant que les premières annonces apparaissent.
+  - Ne recharge pas la pub trop souvent pour éviter les violations.
   ===============================================================
   -->
 </body>
