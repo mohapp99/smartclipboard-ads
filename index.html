@@ -3,162 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Publicité – SmartClipboard</title>
-
-  <!-- 🔹 Balise Meta requise par AdSense -->
+  <title>SmartClipboard Ads</title>
   <meta name="google-adsense-account" content="ca-pub-4439906628582965">
-
-  <!-- 🔹 Script principal Google AdSense (à inclure une seule fois dans le <head>) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4439906628582965"
           crossorigin="anonymous"></script>
 
-  <!-- === Styles (identiques à ton app, aucune modification visuelle) === -->
   <style>
     body, html {
       margin: 0;
       padding: 10px;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #2D2D2D; /* couleur ListItemBrush */
-      color: #E6E6EB;           /* couleur TextPrimaryBrush */
+      background-color: #2D2D2D;
+      color: #E6E6EB;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       text-align: center;
-      box-sizing: border-box;
       overflow: hidden;
     }
-
+    .ad-container {
+      width: 100%;
+    }
     a {
-      color: #78A0FF; /* AccentColor */
+      color: #78A0FF;
       text-decoration: none;
       font-weight: bold;
     }
-
-    img, video, iframe {
+    img, video {
       max-width: 100%;
-      height: auto;
-      border-radius: 6px;
-      margin-top: 10px;
-      border: 1px solid #464650; /* BorderColor */
-    }
-
-    .ad-container {
-      width: 100%; /* correspond à la zone de 20% dans ton app */
+      border-radius: 8px;
+      border: 1px solid #464650;
+      margin-top: 8px;
     }
   </style>
 </head>
 <body>
-  <div class="ad-container">
-    <!-- === Bloc d’annonce automatique AdSense (Google choisit le format) === -->
-    <!-- ✅ Ce bloc affichera des annonces adaptées (images, texte, vidéo, etc.) -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-4439906628582965"
-         data-ad-slot="7584788658"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-
-    <!-- === Zone de publicité personnalisée (optionnelle, pour tes propres pubs internes) === -->
-    <div id="customAds" style="margin-top: 20px;"></div>
+  <div class="ad-container" id="adContainer">
+    <p>Chargement des publicités...</p>
   </div>
 
   <script>
-    /**************************************************************
-     * 🎯 Système optionnel de rotation de pubs personnalisées
-     * Tu peux combiner ce système avec AdSense pour garder
-     * un flux constant d’annonces (photo, vidéo, etc.)
-     **************************************************************/
+    // Variable globale pour stocker la liste des fichiers locaux
+    let localAdFiles = [];
+    let currentAdTimeout = null; // Pour gérer le timer de rotation
 
-    const customAds = [
-      {
-        type: "image",
-        title: "Découvrez notre nouveau produit !",
-        desc: "Cliquez ici pour en savoir plus",
-        link: "https://www.microsoft.com",
-        src: "https://via.placeholder.com/200x150.png?text=Pub+Microsoft"
-      },
-      {
-        type: "video",
-        title: "Regardez notre nouvelle vidéo promo !",
-        desc: "Ne manquez pas notre dernière innovation",
-        link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        src: "https://www.w3schools.com/html/mov_bbb.mp4"
-      },
-      {
-        type: "image",
-        title: "Offre exclusive !",
-        desc: "Profitez de réductions spéciales",
-        link: "https://www.apple.com",
-        src: "https://via.placeholder.com/200x150.png?text=Pub+Apple"
+    /****************************************************
+     * 🎯 Vérifie la connexion Internet
+     ****************************************************/
+    async function hasInternetConnection() {
+      try {
+        const response = await fetch("https://www.google.com/favicon.ico", { method: "HEAD", mode: "no-cors" });
+        return true;
+      } catch (e) {
+        return false;
       }
-    ];
-
-    let current = 0;
-
-    function showCustomAd(index) {
-      const ad = customAds[index];
-      const container = document.getElementById("customAds");
-      container.innerHTML = `
-        <h4>${ad.title}</h4>
-        <a href="${ad.link}" target="_blank">
-          <p>${ad.desc}</p>
-          ${
-            ad.type === "video"
-              ? `<video src="${ad.src}" autoplay muted loop></video>`
-              : `<img src="${ad.src}" alt="Publicité">`
-          }
-        </a>`;
     }
 
-    // 🔁 Alterner toutes les 45 secondes entre les pubs internes
-    showCustomAd(current);
-    setInterval(() => {
-      current = (current + 1) % customAds.length;
-      showCustomAd(current);
-    }, 45000);
+    /****************************************************
+     * 🔹 Affiche le bloc Google AdSense
+     ****************************************************/
+    function showAdSense() {
+      const container = document.getElementById("adContainer");
+      container.innerHTML = `
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-4439906628582965"
+             data-ad-slot="7584788658"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>`;
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    }
+
+    /****************************************************
+     * 🔹 Affiche une publicité locale (image ou vidéo)
+     *    et gère la rotation.
+     ****************************************************/
+    function showNextLocalAd() {
+      const container = document.getElementById("adContainer");
+      // S'assure que la rotation précédente est arrêtée
+      if (currentAdTimeout) clearTimeout(currentAdTimeout);
+
+      if (!localAdFiles || localAdFiles.length === 0) {
+        container.innerHTML = "<p>Aucune publicité locale trouvée.</p>";
+        return;
+      }
+
+      // Choisit un fichier aléatoire dans la liste
+      const randomFile = localAdFiles[Math.floor(Math.random() * localAdFiles.length)];
+      const ext = randomFile.split('.').pop().toLowerCase();
+
+      let mediaHTML = "";
+      let isVideo = false;
+
+      // Génère le HTML en fonction du type de fichier
+      if (["mp4", "webm", "avi"].includes(ext)) {
+        mediaHTML = `<video id="localVideoAd" src="${randomFile}" autoplay muted></video>`;
+        isVideo = true;
+      } else if (["jpg", "jpeg", "png", "gif"].includes(ext)) {
+        mediaHTML = `<img src="${randomFile}" alt="Publicité">`;
+      }
+
+      // Affiche la publicité
+      container.innerHTML = `
+        ${mediaHTML}
+      `;
+
+      // Gère la rotation
+      if (isVideo) {
+        const videoElement = document.getElementById("localVideoAd");
+        // Passe à la pub suivante à la fin de la vidéo
+        videoElement.onended = showNextLocalAd;
+        // Sécurité : si la vidéo ne se charge pas, rotation après 60s
+        currentAdTimeout = setTimeout(showNextLocalAd, 60000);
+      } else {
+        // Pour les images, passe à la pub suivante après 30 secondes
+        currentAdTimeout = setTimeout(showNextLocalAd, 30000);
+      }
+    }
+
+    /****************************************************
+     * 🔹 Point d’entrée principal
+     ****************************************************/
+    (async () => {
+      // 1. Vérifie la connexion Internet
+      const online = await hasInternetConnection();
+
+      if (online) {
+        // 2a. Si en ligne, affiche les publicités Google AdSense
+        showAdSense();
+      } else {
+        // 2b. Si hors ligne, demande la liste des fichiers locaux à l'application C#
+        window.chrome.webview.postMessage("requestLocalAds");
+      }
+    })();
+
+    /****************************************************
+     * 🔹 Réception des fichiers depuis C#
+     ****************************************************/
+    window.chrome?.webview?.addEventListener("message", event => {
+      // Cet écouteur est déclenché à la fois pour la demande initiale
+      // et pour toute mise à jour envoyée par l'application C#.
+      if (event.data && event.data.localAds) {
+        console.log("Mise à jour de la liste des publicités locales reçue.");
+        localAdFiles = event.data.localAds; // Met à jour la liste des fichiers.
+        // Redémarre la rotation avec la nouvelle liste.
+        showNextLocalAd(); // Affiche la première publicité et démarre la rotation
+      }
+    });
   </script>
+</body>
+</html>
 
-  <!--
-  ===============================================================
-  🧩 COMMENTAIRES D’INTÉGRATION
-  ===============================================================
-
-  ✅ Partie 1 – Google AdSense officiel
-  ------------------------------------
-  - Le script <script async src="..."> dans le <head> charge le SDK AdSense.
-  - Le bloc <ins class="adsbygoogle"> est ton emplacement d’annonce.
-  - Google diffusera automatiquement des annonces adaptées
-    (images, bannières, texte, vidéo selon ton trafic).
-
-  ✅ Partie 2 – Pubs personnalisées
-  ---------------------------------
-  - Le tableau "customAds" contient tes propres pubs internes (image ou vidéo).
-  - Elles alternent toutes les 45 secondes.
-  - Tu peux supprimer cette partie si tu veux seulement AdSense.
-
-  ✅ Partie 3 – Compatibilité application Windows
-  -----------------------------------------------
-  - Ton application charge cette page dans un WebView / BrowserControl.
-  - Elle affiche automatiquement le contenu HTML.
-  - Aucune modification côté C# n’est requise.
-
-  ✅ Option avancée – AMP
-  -----------------------------------------------
-  - Tu n’as PAS besoin du code AMP si ton site n’utilise pas le format AMP.
-  - GitHub Pages sert du HTML normal, donc le code ci-dessus suffit.
-  - Le code AMP (<amp-ad>) est réservé aux pages <html amp>.
-
-  ===============================================================
-  💡 CONSEILS
-  ---------------------------------------------------------------
-  - Vérifie dans AdSense que le domaine "mohapp99.github.io" est bien validé.
-  - Attends parfois 24–48 h avant que les premières annonces apparaissent.
-  - Ne recharge pas la pub trop souvent pour éviter les violations.
-  ===============================================================
   -->
 </body>
 </html>
