@@ -1,7 +1,8 @@
 {
-  "localAds": [
-    "file:///C:/.../mohapp.PNG",
-    "file:///C:/.../eee.PNG"
+  "baseUrl": "https://raw.githubusercontent.com/mohapp99/smartclipboard-ads/main/ads-repository/",
+  "files": [
+    "eee.PNG",
+    "mohapp.PNG"
   ]
 }
 
